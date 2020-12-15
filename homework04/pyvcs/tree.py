@@ -9,15 +9,11 @@ from pyvcs.objects import hash_object
 from pyvcs.refs import get_ref, is_detached, resolve_head, update_ref
 
 
-def write_tree(
-    gitdir: pathlib.Path, index: tp.List[GitIndexEntry], dirname: str = ""
-) -> str:
+def write_tree(gitdir: pathlib.Path, index: tp.List[GitIndexEntry], dirname: str = "") -> str:
     """Write a tree object from the current index entries."""
     tree_entries = []
     for entry in read_index():
-        assert (
-            "/" not in entry.path
-        ), "currently only supports a single, top-level directory"
+        assert "/" not in entry.path, "currently only supports a single, top-level directory"
         mode_path = "{:o} {}".format(entry.mode, entry.path).encode()
         tree_entry = mode_path + b"\x00" + entry.sha
         tree_entries.append(tree_entry)
