@@ -1,8 +1,8 @@
+import datetime
 import os
 import pathlib
 import stat
 import time
-import datetime
 import typing as tp
 
 from pyvcs.index import GitIndexEntry, read_index
