@@ -101,6 +101,7 @@ def find_tree_files(tree_sha: str, gitdir: pathlib.Path) -> tp.List[tp.Tuple[str
         tree_files.append((entry[1], collector + str(path)))
     return tree_files
 
+
 def commit_parse(raw: bytes, start: int = 0, dct=None):
     ret_val: tp.Dict[str, tp.Any]
     ret_val = {"message": []}

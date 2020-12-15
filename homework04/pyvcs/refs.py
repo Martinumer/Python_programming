@@ -2,9 +2,12 @@ import pathlib
 import typing as tp
 
 
-def update_ref(gitdir: pathlib.Path, ref: tp.Union[str, pathlib.Path], new_value: str) -> None:
+def update_ref(
+    gitdir: pathlib.Path, ref: tp.Union[str, pathlib.Path], new_value: str
+) -> None:
     with open((gitdir / ref), "w") as file:
         file.write(new_value)
+
 
 def symbolic_ref(gitdir: pathlib.Path, name: str, ref: str) -> None:
     # PUT YOUR CODE HERE
