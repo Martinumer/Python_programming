@@ -7,7 +7,7 @@ import typing as tp
 import zlib
 
 from pyvcs.refs import update_ref
-from pyvcs.repo import repo_find # type: ignore
+from pyvcs.repo import repo_find  # type: ignore
 
 
 def hash_object(data: bytes, fmt: str, write: bool = False) -> str:
@@ -82,7 +82,9 @@ def cat_file(obj_name: str, pretty: bool = True) -> None:
                 print(f"{tree[0]:06}", "blob", tree[2] + "\t" + tree[1])
 
 
-def find_tree_files(tree_sha: str, gitdir: pathlib.Path, collector: str = "") -> tp.List[tp.Tuple[str, str]]:
+def find_tree_files(
+    tree_sha: str, gitdir: pathlib.Path, collector: str = ""
+) -> tp.List[tp.Tuple[str, str]]:
     tree_files = []
     _, tree = read_object(tree_sha, gitdir)
     tree_inputs = read_tree(tree)
