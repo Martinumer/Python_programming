@@ -46,21 +46,19 @@ def commit_tree(
     parent: tp.Optional[str] = None,
     author: tp.Optional[str] = None,
 ) -> str:
-    now = int(time.mktime(time.localtime()))
-    timezone = time.timezone
-    if timezone > 0:
-        formatted_timezone = "-"
+    if "GIT_AUTHOR_NAME" in os.environ and "GET_AUTHOR_EMAIL" is os.environ and author is None:
+        author = (
+            os.getenv("GIT_AUTHOR_NAME", None) + " " + f"<{os.getenv('GIT_AUTHOR_EMAIL', None)}>"  # type: ignore
+        )
+    if time.timezone > 0:
+        timezone = "-"
     else:
-        formatted_timezone = "+"
-    formatted_timezone += f"{abs(timezone) // 3600:02}{abs(timezone) // 60 % 60:02}"
-    commit_content = []
-    commit_content.append(f"tree {tree}")
-    if parent:
-        commit_content.append(f"parent {parent}")
-    if not author:
-        author = f"{os.getenv('GIT_AUTHOR_NAME')} <{os.getenv('GIT_AUTHOR_EMAIL')}"
-        commit_content.append(f"committer {author} {now} {formatted_timezone}")
-        commit_content.append(f"author {author} {now} {formatted_timezone}")
-    commit_content.append(f"\n{message}\n")
-    data = "\n".join(commit_content).encode()
-    return hash_object(data, "commit", write=True)
+        timezone = "+"
+    timezone += f"{abs(time.timezone) // 60 // 60:02}{abs(time.timezone) // 60 % 60:02}"
+    info = [f"tree {tree}"]
+    if parent is not None:
+        info.append(f"parent{parent}")
+    info.append(f"author {author} {int(time.mktime(time.localtime()))} {timezone}")
+    info.append(f"committer {author} {int(time.mktime(time.localtime()))} {timezone}")
+    info.append(f"\n{message}\n")
+    return hash.object("\n".join(info).encode(), "commit", write=True)
