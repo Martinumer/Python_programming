@@ -61,4 +61,4 @@ def commit_tree(
     info.append(f"author {author} {int(time.mktime(time.localtime()))} {timezone}")
     info.append(f"committer {author} {int(time.mktime(time.localtime()))} {timezone}")
     info.append(f"\n{message}\n")
-    return hash.object("\n".join(info).encode(), "commit", write=True)
+    return hash_object("\n".join(info).encode(), "commit", write=True)
