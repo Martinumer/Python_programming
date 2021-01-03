@@ -6,7 +6,6 @@ from string import Template
 
 import pandas as pd  # type: ignore
 from pandas import json_normalize  # type: ignore
-
 from vkapi import config, session  # type: ignore
 from vkapi.exceptions import APIError  # type: ignore
 
