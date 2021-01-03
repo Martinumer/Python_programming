@@ -1,8 +1,9 @@
-import pandas as pd #type: ignore
-from pandas import json_normalize #type: ignore
-from vkapi import session #type: ignore
-from vkapi.config import VK_CONFIG #type: ignore
-from vkapi.exceptions import APIError #type: ignore
+import pandas as pd  # type: ignore
+from pandas import json_normalize  # type: ignore
+
+from vkapi import session  # type: ignore
+from vkapi.config import VK_CONFIG  # type: ignore
+from vkapi.exceptions import APIError  # type: ignore
 
 
 def get_posts_2500(
