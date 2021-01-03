@@ -1,8 +1,9 @@
 import typing as tp
-import requests
 from collections import OrderedDict
-from requests.adapters import HTTPAdapter
 from urllib.error import HTTPError
+
+import requests
+from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 
