@@ -4,10 +4,12 @@ import time
 import typing as tp
 from string import Template
 
-import pandas as pd  # type: ignore
-from pandas import json_normalize  # type: ignore
-from vkapi import config, session  # type: ignore
-from vkapi.exceptions import APIError  # type: ignore
+import pandas as pd
+from pandas import json_normalize
+
+from vkapi import session
+from vkapi.config import VK_CONFIG
+from vkapi.exceptions import APIError
 
 
 def get_posts_2500(
@@ -18,45 +20,33 @@ def get_posts_2500(
     max_count: int = 2500,
     filter: str = "owner",
     extended: int = 0,
-    fields: tp.Optional[tp.List[str]] = None,  # type: ignore
-) -> tp.Dict[str, tp.Any]:  # type: ignore
+    fields: tp.Optional[tp.List[str]] = None,
+) -> tp.Dict[str, tp.Any]:
     script = f"""
-                var a = 0; 
-                var action = [];
-                while (a < {max_count}){{
-                    if ({offset}+a+100 > {count}){{
-                        action.push(API.wall.get({{
-                            "owner_id": "{owner_id}",
-                            "domain": "{domain}",
-                            "offset": "{offset} +a",
-                            "count": "{count}-(a+{offset})",
-                            "filter": "{filter}",
-                            "extended": "{extended}",
-                            "fields": "{fields}"
-                        }}));
-                    }} 
-                    action.push(API.wall.get({{
-                        "owner_id": "{owner_id}",
-                        "domain": "{domain}",
-                        "offset": "{offset} +a",
-                        "count": "{count}",
-                        "filter": "{filter}",
-                        "extended": "{extended}",
-                        "fields": "{fields}"
-                    }}));
-                    a = a + {max_count};
-                }}
-                return action;
+                var i = 0;
+                var result = [];
+                while i < {max_count} {{
+                    result.push(
+                                API.wall.get(
+                                            {
+                                            {
+                                            f"owner_id: {owner_id}",
+                                            f"domain: {domain}",
+                                            f"offset: {offset} + i",
+                                            f"count: {count}",
+                                            f"filter: {filter}",
+                                            f"extended: {extended}",
+                                            f"fields: {fields}"    
+                                            }
+                                            }
+                                            )
+                                )
+                    i = i + {count}
+                }}return ;
             """
-    data = {
-        "code": script,
-        "access_token": VK_CONFIG["access_token"],  # type: ignore
-        "v": VK_CONFIG["version"],  # type: ignore
-    }
-    response = session.post("execute", data=data)
-    if "error" in response.json() or not response.ok:
-        raise APIError(response.json()["error"]["error_msg"])
-    return response.json()["response"]["items"]
+    data = {"code": script}
+    response = session.post("/execute", data=data).json()["response"]
+    return response["items"]
 
 
 def get_wall_execute(
@@ -67,7 +57,7 @@ def get_wall_execute(
     max_count: int = 2500,
     filter: str = "owner",
     extended: int = 0,
-    fields: tp.Optional[tp.List[str]] = None,  # type: ignore
+    fields: tp.Optional[tp.List[str]] = None,
     progress=None,
 ) -> pd.DataFrame:
     """
@@ -85,37 +75,31 @@ def get_wall_execute(
     :param fields: Список дополнительных полей для профилей и сообществ, которые необходимо вернуть.
     :param progress: Callback для отображения прогресса.
     """
-    wall = []
-    response = session.post(
-        "execute",
-        data={
-            "code": f'return {{"count": API.wall.get({{"owner_id": "{owner_id}","domain": "{domain}","offset": "0","count": "1","filter": "{filter}"}}).count}};',
-            "access_token": VK_CONFIG["access_token"],  # type: ignore
-            "v": VK_CONFIG["version"],  # type: ignore
-        },
-    )
-    if "error" in response.json() or not response.ok:
-        raise APIError(response.json()["error"]["error_msg"])
-    if count != 0:
-        count = min(count, response.json()["response"]["count"])
-    else:
-        count = response.json()["response"]["count"]
+    old_data = pd.DataFrame()
+    code = f"""
+            return API.wall.get ({{
+            "owner_id": "{owner_id}",
+            "domain": "{domain}",
+            "offset": "0",
+            "count": "1",
+            "filter": "{filter}",
+            "extended": "0",
+            "fields": ""
+}});
+"""
+    data = {"code": code}
+    response = session.post("/execute", data=data).json()
+    if "error" in response:
+        raise APIError(response["error"]["error_msg"])
     if progress is None:
         progress = lambda x: x
-
-    for a in progress(range((count + max_count - 1) // max_count)):
-        wall.append(
-            get_posts_2500(
-                owner_id,
-                domain,
-                offset + a * max_count,
-                count,
-                max_count,
-                filter,
-                extended,
-                fields,
+    for _ in progress(
+        range(0, math.ceil((response["response"]["count"] if count == 0 else count) / max_count))
+    ):
+        old_data = old_data.append(
+            json_normalize(
+                get_posts_2500(owner_id, domain, offset, count, max_count, filter, extended, fields)
             )
         )
-        if a % 3 == 1:
-            time.sleep(1)  # type: ignore
-    return json_normalize(wall)
+        time.sleep(1)
+    return old_data
