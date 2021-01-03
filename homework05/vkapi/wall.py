@@ -18,8 +18,8 @@ def get_posts_2500(
     max_count: int = 2500,
     filter: str = "owner",
     extended: int = 0,
-    fields: tp.Optional[tp.List[str]] = None, #type: ignore
-) -> tp.Dict[str, tp.Any]: #type: ignore
+    fields: tp.Optional[tp.List[str]] = None,  # type: ignore
+) -> tp.Dict[str, tp.Any]:  # type: ignore
     script = f"""
                 var a = 0; 
                 var action = [];
@@ -67,7 +67,7 @@ def get_wall_execute(
     max_count: int = 2500,
     filter: str = "owner",
     extended: int = 0,
-    fields: tp.Optional[tp.List[str]] = None, #type: ignore
+    fields: tp.Optional[tp.List[str]] = None,  # type: ignore
     progress=None,
 ) -> pd.DataFrame:
     """
@@ -117,5 +117,5 @@ def get_wall_execute(
             )
         )
         if a % 3 == 1:
-            time.sleep(1) #type: ignore
+            time.sleep(1)  # type: ignore
     return json_normalize(wall)
