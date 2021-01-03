@@ -4,10 +4,10 @@ import time
 import typing as tp
 from string import Template
 
-import pandas as pd
-from pandas import json_normalize
-from vkapi import config, session
-from vkapi.exceptions import APIError
+import pandas as pd # type: ignore
+from pandas import json_normalize # type: ignore
+from vkapi import config, session # type: ignore
+from vkapi.exceptions import APIError # type: ignore
 
 
 def get_posts_2500(
@@ -50,8 +50,8 @@ def get_posts_2500(
             """
     data = {
         "code": script,
-        "access_token": VK_CONFIG["access_token"],
-        "v": VK_CONFIG["version"],
+        "access_token": VK_CONFIG["access_token"], # type: ignore
+        "v": VK_CONFIG["version"], # type: ignore
     }
     response = session.post("execute", data=data)
     if "error" in response.json() or not response.ok:
@@ -90,8 +90,8 @@ def get_wall_execute(
         "execute",
         data={
             "code": f'return {{"count": API.wall.get({{"owner_id": "{owner_id}","domain": "{domain}","offset": "0","count": "1","filter": "{filter}"}}).count}};',
-            "access_token": VK_CONFIG["access_token"],
-            "v": VK_CONFIG["version"],
+            "access_token": VK_CONFIG["access_token"], # type: ignore
+            "v": VK_CONFIG["version"], # type: ignore
         },
     )
     if "error" in response.json() or not response.ok:
