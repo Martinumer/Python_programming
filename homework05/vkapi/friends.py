@@ -3,9 +3,9 @@ import math
 import time
 import typing as tp
 
-from vkapi import session #type: ignore
-from vkapi.config import VK_CONFIG #type: ignore
-from vkapi.exceptions import APIError #type: ignore
+from vkapi import session  # type: ignore
+from vkapi.config import VK_CONFIG  # type: ignore
+from vkapi.exceptions import APIError  # type: ignore
 
 QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
 
