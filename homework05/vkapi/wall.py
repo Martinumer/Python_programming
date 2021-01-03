@@ -1,9 +1,15 @@
-import pandas as pd  # type: ignore
-from pandas import json_normalize  # type: ignore
+import math
+import textwrap
+import time
+import typing as tp
+from string import Template
 
-from vkapi import session  # type: ignore
-from vkapi.config import VK_CONFIG  # type: ignore
-from vkapi.exceptions import APIError  # type: ignore
+import pandas as pd
+from pandas import json_normalize
+
+from vkapi import session
+from vkapi.config import VK_CONFIG
+from vkapi.exceptions import APIError
 
 
 def get_posts_2500(
