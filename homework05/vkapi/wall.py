@@ -50,8 +50,8 @@ def get_posts_2500(
             """
     data = {
         "code": script,
-        "access_token": VK_CONFIG["access_token"], # type: ignore
-        "v": VK_CONFIG["version"], # type: ignore
+        "access_token": VK_CONFIG["access_token"],  # type: ignore
+        "v": VK_CONFIG["version"],  # type: ignore
     }
     response = session.post("execute", data=data)
     if "error" in response.json() or not response.ok:
@@ -90,8 +90,8 @@ def get_wall_execute(
         "execute",
         data={
             "code": f'return {{"count": API.wall.get({{"owner_id": "{owner_id}","domain": "{domain}","offset": "0","count": "1","filter": "{filter}"}}).count}};',
-            "access_token": VK_CONFIG["access_token"], # type: ignore
-            "v": VK_CONFIG["version"], # type: ignore
+            "access_token": VK_CONFIG["access_token"],  # type: ignore
+            "v": VK_CONFIG["version"],  # type: ignore
         },
     )
     if "error" in response.json() or not response.ok:
