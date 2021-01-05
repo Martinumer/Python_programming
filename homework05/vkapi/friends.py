@@ -101,12 +101,12 @@ def get_mutual(
         ).json()["response"]
         result.extend(
             MutualFriends(
-                id=data["id"],
-                common_friends=data["common_friends"],
-                common_count=data["common_count"],
+                id=data["response"]["id"],  # type: ignore
+                common_friends=data["response"]["common_friends"],  # type: ignore
+                common_count=data["response"]["common_count"],
             )
             for data in response
         )
-        time.sleep(0.34)
+        time.sleep(1)
 
     return result
