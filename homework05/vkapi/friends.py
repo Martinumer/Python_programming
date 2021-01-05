@@ -93,7 +93,7 @@ def get_mutual(
             params={
                 "target_uid": target_uid,
                 "source_uid": source_uid,
-                "target_uids": ", ".join(map(str, target_uids)),
+                "target_uids": ", ".join(map(str, target_uids)),  # type: ignore
                 "order": order,
                 "count": count,
                 "offset": offset,
