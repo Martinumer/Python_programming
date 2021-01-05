@@ -33,4 +33,3 @@ def age_predict(user_id: int) -> tp.Optional[float]:
     if years_of_birth:
         return float(statistics.median(years_of_birth))
     return None
-
