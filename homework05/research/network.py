@@ -18,7 +18,7 @@ def ego_network(
     :param friends: Идентификаторы друзей, между которыми устанавливаются связи.
     """
     result = []
-    if friends is None:
+    if not friends:
         friends_fields: tp.List[tp.Dict[str, tp.Any]] = get_friends(user_id, fields=["nickname", "is_closed, deactivate"]).items  # type: ignore
         friends = [
             friend["id"]
@@ -67,7 +67,7 @@ def describe_communities(
     friends: tp.List[tp.Dict[str, tp.Any]],
     fields: tp.Optional[tp.List[str]] = None,
 ) -> pd.DataFrame:
-    if fields is None:
+    if not fields:
         fields = ["first_name", "last_name"]
 
     data = []
