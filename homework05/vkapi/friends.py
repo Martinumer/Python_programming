@@ -104,4 +104,3 @@ def get_mutual(
             responses.extend(response.json()["response"])
         time.sleep(1)
     return responses
-
