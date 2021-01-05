@@ -91,13 +91,12 @@ def get_mutual(
         response = session.get(
             "friends.getMutual",
             params={
+                "target_uid": target_uid,
                 "source_uid": source_uid,
-                "target_uids": [shift : shift + 100]  # type: ignore
+                "target_uids": ", ".join(map(str, target_uids)),
                 "order": order,
                 "count": count,
-                "offset": offset + shift,
-                "access_token": config.VK_CONFIG["access_token"],
-                "v": config.VK_CONFIG["version"],
+                "offset": offset,
             },
         ).json()["response"]
         result.extend(
