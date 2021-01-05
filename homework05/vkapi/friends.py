@@ -72,42 +72,37 @@ def get_mutual(
     :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
     :param progress: Callback для отображения прогресса.
     """
-    if target_uids is None:
-        params = {
-            "access_token": VK_CONFIG["access_token"],
-            "v": VK_CONFIG["version"],
-            "source_uid": source_uid if source_uid is not None else "",
-            "target_uid": target_uid,
-            "order": order,
-        }
-        response = session.get(f"friends.getMutual", params=params)
-        if "error" in response.json() or not response.ok:
-            raise APIError(response.json()["error"]["error_msg"])
-        return response.json()["response"]
-
+    if not target_uids:
+        if not target_uid:
+            raise Exception
+        target_uids = [target_uid]
     responses = []
-    if progress is None:
-        progress = lambda x: x
-    for i in progress(range(((len(target_uids) + 99) // 100))):
+    if progress:
+        row = progress(range(math.ceil(len(target_uids) / 100)))
+    else:
+        row = range(math.ceil(len(target_uids) / 100))
+    for sth in row:
         params = {
-            "access_token": VK_CONFIG["access_token"],
-            "v": VK_CONFIG["version"],
-            "target_uids": ",".join(map(str, target_uids)),
+            "target_uid": target_uid,
+            "source_uid": source_uid,
+            "target_uids": ", ".join(map(str, target_uids)),
             "order": order,
-            "count": count if count is not None else "",
-            "offset": offset + i * 100,
+            "count": count,
+            "offset": offset,
         }
-        response = session.get(f"friends.getMutual", params=params)
-        if "error" in response.json() or not response.ok:
-            raise APIError(response.json()["error"]["error_msg"])
-        for j in response.json()["response"]:
-            responses.append(
+        response = session.get(f"/friends.getMutual", params=params)
+        if response.status_code != 200:
+            raise APIError
+        offset += 100
+        if not isinstance(response.json()["response"], list):
+            response.append(  # type: ignore
                 MutualFriends(
-                    id=j["id"],
-                    common_friends=j["common_friends"],
-                    common_count=j["common_count"],
+                    id=response["response"]["id"],  # type: ignore
+                    common_friends=response["response"]["common_friends"],  # type: ignore
+                    common_count=response["response"]["common_count"],  # type: ignore
                 )
             )
-        if i % 3 == 2:
-            time.sleep(1)
+        else:
+            responses.extend(response.json()["response"])
+        time.sleep(1)
     return responses
