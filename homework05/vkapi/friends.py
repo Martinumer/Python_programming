@@ -1,3 +1,11 @@
+# pylint: disable=missing-function-docstring
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=unused-argument
+# pylint: disable=unused-import
+# pylint: disable=too-many-arguments
+# pylint: disable=redefined-builtin
+
 import dataclasses
 import math
 import time
@@ -17,10 +25,7 @@ class FriendsResponse:
 
 
 def get_friends(
-    user_id: tp.Optional[int],
-    count: int = 5000,
-    offset: int = 0,
-    fields: tp.Optional[tp.List[str]] = None,
+    user_id: int, count: int = 5000, offset: int = 0, fields: tp.Optional[tp.List[str]] = None
 ) -> FriendsResponse:
     """
     Получить список идентификаторов друзей пользователя или расширенную информацию
@@ -32,16 +37,9 @@ def get_friends(
     :param fields: Список полей, которые нужно получить для каждого пользователя.
     :return: Список идентификаторов друзей пользователя или список пользователей.
     """
-    params = {
-        "access_token": VK_CONFIG["access_token"],
-        "v": VK_CONFIG["version"],
-        "count": count,
-        "user_id": user_id if user_id is not None else "",
-        "fields": ",".join(fields) if fields is not None else "",
-        "offset": offset,
-    }
-    response = session.get("friends.get", params=params)
-    if "error" in response.json() or not response.ok:
+    params = {"user_id": user_id, "count": count, "offset": offset, "fields": fields}
+    response = session.get("/friends.get", params=params)
+    if response.status_code != 200:
         raise APIError(response.json()["error"]["error_msg"])
     return FriendsResponse(**response.json()["response"])
 
@@ -72,8 +70,8 @@ def get_mutual(
     :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
     :param progress: Callback для отображения прогресса.
     """
-    if not target_uids:
-        if not target_uid:
+    if target_uids is None:
+        if target_uid is None:
             raise Exception
         target_uids = [target_uid]
     responses = []
@@ -106,3 +104,4 @@ def get_mutual(
             responses.extend(response.json()["response"])
         time.sleep(1)
     return responses
+
