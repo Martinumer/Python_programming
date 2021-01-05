@@ -73,8 +73,8 @@ def get_mutual(
     :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
     :param progress: Callback для отображения прогресса.
     """
-    if target_uids is None:
-        if target_uid is None:
+    if not target_uids:
+        if not target_uid:
             raise Exception
         target_uids = [target_uid]
     responses = []
