@@ -26,7 +26,7 @@ def ego_network(
     :param friends: Идентификаторы друзей, между которыми устанавливаются связи.
     """
     graph = []
-    if friends is None:
+    if not friends:
         friends_fields = get_friends(user_id, fields=["nickname", "is_closed, deactivate"]).items  # type: ignore
         friends = [
             friend["id"]  # type: ignore
