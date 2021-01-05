@@ -1,9 +1,9 @@
-import gensim  # type: ignore
-import pyLDAvis.gensim  # type: ignore
-from gensim.corpora import Dictionary  # type: ignore
-from textacy import preprocessing  # type: ignore
-from tqdm import tqdm  # type: ignore
-from vkapi.wall import get_wall_execute  # type: ignore
+import gensim
+import pyLDAvis.gensim
+from gensim.corpora import Dictionary
+from textacy import preprocessing
+from tqdm import tqdm
+from vkapi.wall import get_wall_execute
 
 
 def example():
@@ -21,6 +21,10 @@ def example():
     ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=10, id2word=dictionary, passes=15)
     vis = pyLDAvis.gensim.prepare(ldamodel, corpus, dictionary)
     pyLDAvis.show(vis)
+
+
+if __name__ == "__main__":
+    example()
 
 
 if __name__ == "__main__":
