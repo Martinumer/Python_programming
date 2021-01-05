@@ -98,7 +98,7 @@ def get_wall_execute(
     response = session.post("/execute", data=data).json()
     if "error" in response:
         raise APIError(response["error"]["error_msg"])
-    if progress is None:
+    if not progress:
         progress = lambda x: x
     for _ in progress(
         range(0, math.ceil((response["response"]["count"] if count == 0 else count) / max_count))
