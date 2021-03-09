@@ -3,7 +3,6 @@ import pyLDAvis.gensim
 from gensim.corpora import Dictionary
 from textacy import preprocessing
 from tqdm import tqdm
-
 from vkapi.wall import get_wall_execute
 
 
@@ -22,6 +21,10 @@ def example():
     ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=10, id2word=dictionary, passes=15)
     vis = pyLDAvis.gensim.prepare(ldamodel, corpus, dictionary)
     pyLDAvis.show(vis)
+
+
+if __name__ == "__main__":
+    example()
 
 
 if __name__ == "__main__":

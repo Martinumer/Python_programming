@@ -1,9 +1,18 @@
+# pylint: disable=missing-function-docstring
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=unused-argument
+# pylint: disable=unused-import
+# pylint: disable=too-many-arguments
+# pylint: disable=redefined-builtin
+
 import dataclasses
 import math
 import time
 import typing as tp
 
-from vkapi import config, session
+from vkapi import session
+from vkapi.config import VK_CONFIG
 from vkapi.exceptions import APIError
 
 QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
@@ -16,7 +25,10 @@ class FriendsResponse:
 
 
 def get_friends(
-    user_id: int, count: int = 5000, offset: int = 0, fields: tp.Optional[tp.List[str]] = None
+    user_id: int,
+    count: int = 5000,
+    offset: int = 0,
+    fields: tp.Optional[tp.List[str]] = None,
 ) -> FriendsResponse:
     """
     Получить список идентификаторов друзей пользователя или расширенную информацию
@@ -28,7 +40,11 @@ def get_friends(
     :param fields: Список полей, которые нужно получить для каждого пользователя.
     :return: Список идентификаторов друзей пользователя или список пользователей.
     """
-    pass
+    params = {"user_id": user_id, "count": count, "offset": offset, "fields": fields}
+    response = session.get("/friends.get", params=params)
+    if response.status_code != 200:
+        raise APIError(response.json()["error"]["error_msg"])
+    return FriendsResponse(**response.json()["response"])
 
 
 class MutualFriends(tp.TypedDict):
@@ -57,4 +73,37 @@ def get_mutual(
     :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
     :param progress: Callback для отображения прогресса.
     """
-    pass
+    if not target_uids:
+        if not target_uid:
+            raise Exception
+        target_uids = [target_uid]
+    responses = []
+    if progress:
+        row = progress(range(math.ceil(len(target_uids) / 100)))
+    else:
+        row = range(math.ceil(len(target_uids) / 100))
+    for sth in row:
+        params = {
+            "target_uid": target_uid,
+            "source_uid": source_uid,
+            "target_uids": ", ".join(map(str, target_uids)),
+            "order": order,
+            "count": count,
+            "offset": offset,
+        }
+        response = session.get(f"/friends.getMutual", params=params)
+        if response.status_code != 200:
+            raise APIError
+        offset += 100
+        if not isinstance(response.json()["response"], list):
+            response.append(  # type: ignore
+                MutualFriends(
+                    id=response["response"]["id"],  # type: ignore
+                    common_friends=response["response"]["common_friends"],  # type: ignore
+                    common_count=response["response"]["common_count"],  # type: ignore
+                )
+            )
+        else:
+            responses.extend(response.json()["response"])
+        time.sleep(1)
+    return responses
