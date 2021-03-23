@@ -17,12 +17,19 @@ class News(Base):
     points = Column(Integer)
     label = Column(String)
 
+
 Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
     s = session()
-    news_list = get_news('https://news.ycombinator.com/newest', n_pages=10)
+    news_list = get_news("https://news.ycombinator.com/newest", n_pages=10)
     for i in range(len(news_list)):
-        news = News(title=news_list[i]['title'], author=news_list[i]['author'], url=news_list[i]['url'], comments=news_list[i]['comments'], points=news_list[i]['points'])
+        news = News(
+            title=news_list[i]["title"],
+            author=news_list[i]["author"],
+            url=news_list[i]["url"],
+            comments=news_list[i]["comments"],
+            points=news_list[i]["points"],
+        )
         s.add(news)
         s.commit()
