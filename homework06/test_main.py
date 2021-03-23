@@ -12,7 +12,9 @@ def test_clear():
 
 
 def test_classification_single_words():
-    x_train = [hackernews.clean(s).lower() for s in "The quick brown fox jumps over the lazy dog".split()]
+    x_train = [
+        hackernews.clean(s).lower() for s in "The quick brown fox jumps over the lazy dog".split()
+    ]
     y_train = ["NOT_ANIMAL"] * 3 + ["ANIMAL"] + ["NOT_ANIMAL"] * 4 + ["ANIMAL"]
 
     model = bayes.NaiveBayesClassifier()
@@ -30,7 +32,12 @@ def test_classification_massages_dataset():
         targets.append(target)
 
     msgs = [hackernews.clean(msg).lower() for msg in msgs]
-    msgs_train, targets_train, msgs_test, targets_test = msgs[:3900], targets[:3900], msgs[3900:], targets[3900:]
+    msgs_train, targets_train, msgs_test, targets_test = (
+        msgs[:3900],
+        targets[:3900],
+        msgs[3900:],
+        targets[3900:],
+    )
 
     model = bayes.NaiveBayesClassifier()
     model.fit(msgs_train, targets_train)
@@ -42,7 +49,7 @@ def test_next_page_parser():
     url = "https://news.ycombinator.com/"
     for i in range(2, 5):
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        soup = BeautifulSoup(response.text, "html.parser")
         next_url = scraputils.extract_next_page(soup)
         assert next_url == "news?p=" + str(i)
         url = "https://news.ycombinator.com/" + next_url
