@@ -3,7 +3,6 @@ from math import log
 
 
 class NaiveBayesClassifier:
-
     def __init__(self, a: int = 1e-5):
         self.d = 0
         self.word = defaultdict(lambda: 0)
@@ -30,10 +29,12 @@ class NaiveBayesClassifier:
         """ Perform classification on an array of test vectors X. """
         assert len(self.classes) > 0
         return max(
-            self.classes.keys(), key=lambda c:
-            log(self.classes[c]) + sum(
-                log((self.classified_words[w, c] + self.a) / (self.word[w] + self.a * self.d)
-                    ) for w in feature.split())
+            self.classes.keys(),
+            key=lambda c: log(self.classes[c])
+            + sum(
+                log((self.classified_words[w, c] + self.a) / (self.word[w] + self.a * self.d))
+                for w in feature.split()
+            ),
         )
 
     def _get_predictions(self, dataset):
@@ -45,5 +46,6 @@ class NaiveBayesClassifier:
     def score(self, dataset, classes):
         """ Returns the mean accuracy on the given test data and labels. """
         predicted = self._get_predictions(dataset)
-        return sum(0 if predicted[i] != classes[i] else 1 for i in range(len(dataset))) / len(dataset)
-
+        return sum(0 if predicted[i] != classes[i] else 1 for i in range(len(dataset))) / len(
+            dataset
+        )
