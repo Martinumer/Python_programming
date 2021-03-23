@@ -1,11 +1,8 @@
-import csv
-
-import requests
-from bs4 import BeautifulSoup
-
 import bayes
-import hackernews
-import scraputils
+ import hackernews
++import requests
+ import scraputils
++from bs4 import BeautifulSoup
 
 
 def test_clear():
