@@ -18,22 +18,24 @@ def extract_news(parser):
 
     for i in range(len(links)):
         author = subtexts[i].find("a", {"class": "hnuser"})
-        comments = extract_first_integer_from_tag(subtexts[i].find_all("a")[-1], '\xa0')
-        points = extract_first_integer_from_tag(subtexts[i].find("span", {"class": "score"}), ' ')
+        comments = extract_first_integer_from_tag(subtexts[i].find_all("a")[-1], "\xa0")
+        points = extract_first_integer_from_tag(subtexts[i].find("span", {"class": "score"}), " ")
 
-        news.append({
-            'author': None if author is None else author.text,
-            'comments': comments,
-            'points': points,
-            'title': links[i].text,
-            'url': links[i]['href']
-        })
+        news.append(
+            {
+                "author": None if author is None else author.text,
+                "comments": comments,
+                "points": points,
+                "title": links[i].text,
+                "url": links[i]["href"],
+            }
+        )
     return news
 
 
 def extract_next_page(parser):
     """ Extract next page URL """
-    return parser.find("a", {"class": "morelink"})['href']
+    return parser.find("a", {"class": "morelink"})["href"]
 
 
 def get_news(url, n_pages=1):
@@ -41,7 +43,7 @@ def get_news(url, n_pages=1):
     news = []
     while n_pages:
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        soup = BeautifulSoup(response.text, "html.parser")
         current_news = extract_news(soup)
         next_url = extract_next_page(soup)
         url = "https://news.ycombinator.com/" + next_url
