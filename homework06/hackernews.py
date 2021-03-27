@@ -1,8 +1,10 @@
 import string
+
 from bottle import redirect, request, route, run, template
-from scraputils import get_news
-from db import News, session
+
 from bayes import NaiveBayesClassifier
+from db import News, session
+from scraputils import get_news
 
 
 @route("/news")
