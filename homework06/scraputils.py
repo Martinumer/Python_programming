@@ -11,44 +11,40 @@ def extract_news(parser):
         except ValueError:
             return 0
 
-    news_list = []
+    news = []
 
-    news = parser.findAll("a", {"class": "storylink"})
+    links = parser.findAll("a", {"class": "storylink"})
     subtexts = parser.findAll("td", {"class": "subtext"})
 
-    for new in range(len(news)):
-        author = subtexts[new].find("a", {"class": "hnuser"})
-        comments = extract_first_integer_from_tag(subtexts[new].find_all("a")[-1], "\xa0")
-        points = extract_first_integer_from_tag(subtexts[new].find("span", {"class": "score"}), " ")
+    for i in range(len(links)):
+        author = subtexts[i].find("a", {"class": "hnuser"})
+        comments = extract_first_integer_from_tag(subtexts[i].find_all("a")[-1], '\xa0')
+        points = extract_first_integer_from_tag(subtexts[i].find("span", {"class": "score"}), ' ')
 
-        news.append(
-            {
-                "author": None if author is None else author.text,
-                "comments": comments,
-                "points": points,
-                "title": news[new].text,
-                "url": news[new]["href"],
-            }
-        )
-
-    return news_list
+        news.append({
+            'author': None if author is None else author.text,
+            'comments': comments,
+            'points': points,
+            'title': links[i].text,
+            'url': links[i]['href']
+        })
+    return news
 
 
 def extract_next_page(parser):
     """ Extract next page URL """
-    return parser.find("a", {"class": "morelink"})["href"]
+    return parser.find("a", {"class": "morelink"})['href']
 
 
 def get_news(url, n_pages=1):
     """ Collect news from a given web page """
     news = []
     while n_pages:
-        print("Collecting data from page: {}".format(url))
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-        news_list = extract_news(soup)
-        next_page = extract_next_page(soup)
-        url = "https://news.ycombinator.com/" + next_page
-        news.extend(news_list)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        current_news = extract_news(soup)
+        next_url = extract_next_page(soup)
+        url = "https://news.ycombinator.com/" + next_url
+        news.extend(current_news)
         n_pages -= 1
     return news
