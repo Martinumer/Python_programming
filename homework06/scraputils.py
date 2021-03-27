@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup # type: ignore
+from bs4 import BeautifulSoup  # type: ignore
 
 
 def extract_news(parser):
