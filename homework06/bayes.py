@@ -3,11 +3,11 @@ from math import log
 
 
 class NaiveBayesClassifier:
-    def __init__(self, a: int = 1e-5):
+    def __init__(self, a: float = 1e-5):
         self.d = 0
-        self.word = defaultdict(lambda: 0)
-        self.classified_words = defaultdict(lambda: 0)
-        self.classes = defaultdict(lambda: 0)
+        self.word = defaultdict(lambda: 0)  # type:ignore
+        self.classified_words = defaultdict(lambda: 0)  # type:ignore
+        self.classes = defaultdict(lambda: 0)  # type:ignore
         self.a = a
 
     def fit(self, dataset, classes):
