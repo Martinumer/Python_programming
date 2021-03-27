@@ -1,7 +1,9 @@
+import string
+
 from bayes import NaiveBayesClassifier
 from bottle import redirect, request, route, run, template
 from db import News, session
-from scrapper import get_news
+from scraputils import get_news
 
 
 @route("/news")
@@ -17,7 +19,7 @@ def add_label():
     id = int(query["id"])
     label = query["label"]
     s = session()
-    s.query(News.id).filter(News.id == id).update({News.label: label})
+    s.query(News).filter(News.id == id).update({News.label: label})
     s.commit()
     redirect("/news")
 
