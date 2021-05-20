@@ -42,7 +42,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-df = pd.read_csv("adult.csv", delimiter=",", names = ["age", "workclass", "fnlwgt", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-week", "native-country", "salary"])
+df = pd.read_csv("adult.data.csv") #, delimiter=",", names = ["age", "workclass", "fnlwgt", "education", "education-num", "marital-status", "occupation", "relationship", "race", "sex", "capital-gain", "capital-loss", "hours-per-week", "native-country", "salary"])
 
 df.head()
 
@@ -52,11 +52,11 @@ df['sex'].value_counts()
 
 """**2. Каков средний возраст (признак *age*) женщин?**"""
 
-print('Средний возраст женщин', df.groupby('sex').age.mean()[:1])
+print('Средний возраст женщин', df[df.sex == "Female"].age.mean())
 
 """**3. Какова доля граждан Германии (признак *native-country*)?**"""
 
-print('Доля граждан Германиии', df['native-country'].value_counts(['Germany'])[4:5])
+print('Доля граждан Германиии', df['native-country'].value_counts().loc['Germany'] / len(df))
 
 """**4-5. Каковы средние значения и среднеквадратичные отклонения возраста тех, кто получает более 50K в год (признак *salary*) и тех, кто получает менее 50K в год? **"""
 
@@ -68,47 +68,63 @@ print(d)
 
 """**6. Правда ли, что люди, которые получают больше 50k, имеют как минимум высшее образование? (признак *education – Bachelors, Prof-school, Assoc-acdm, Assoc-voc, Masters* или *Doctorate*)**"""
 
-df.groupby(["education", "salary"]).salary.describe()
+ed_data = df[df["salary"] == ">50K"]["education"].unique()
+ed_list = ['HS-grad', 'Some-college', '7th-8th', '12th', '10th', '11th', '9th', '5th-6th', '1st-4th']
+is_it = True
+for i in range(len(ed_list)):
+    if ed_list[i] in ed_data:
+        is_it = False
+print(is_it)
 
 """**7. Выведите статистику возраста для каждой расы (признак *race*) и каждого пола. Используйте *groupby* и *describe*. Найдите таким образом максимальный возраст мужчин расы *Amer-Indian-Eskimo*.**"""
 
-for (race, sex), sub_df in df.groupby(['race', 'sex']):
-    print("Race: {0}, sex: {1}".format(race, sex))
-    print(sub_df['age'].describe())
+grouped_by_sex_and_race = df.groupby(['race', 'sex'])
+print(df.groupby(["race", "sex"]).age.describe())
 
-df.groupby(['race', 'sex']).age.max().reset_index()[1:2]
 
 """**8. Среди кого больше доля зарабатывающих много (>50K): среди женатых или холостых мужчин (признак *marital-status*)? Женатыми считаем тех, у кого *marital-status* начинается с *Married* (Married-civ-spouse, Married-spouse-absent или Married-AF-spouse), остальных считаем холостыми.**"""
 
-df[
+a = df[
     (df["sex"] == "Male")
-    & (df["marital-status"].isin(["Never-married", "Separated", "Divorced"]))
+    & (df["marital-status"].str.startswith("Married"))
+    & (df["salary"] == ">50K")
 ]["salary"].value_counts()
-
-df[(df["sex"] == "Male") & (df["marital-status"].str.startswith("Married"))][
+b = df[(df["sex"] == "Male") & (df["marital-status"] == "Divorced") & (df["salary"] == ">50K")][
     "salary"
 ].value_counts()
+c = df[(df["sex"] == "Male") & (df["marital-status"] == "Separated") & (df["salary"] == ">50K")][
+    "salary"
+].value_counts()
+d = df[
+    (df["sex"] == "Male") & (df["marital-status"] == "Never-married") & (df["salary"] == ">50K")
+]["salary"].value_counts()
+e = df[(df["sex"] == "Male") & (df["marital-status"] == "Widowed") & (df["salary"] == ">50K")][
+    "salary"
+].value_counts()
+f = b + c + d + e
+print(a)
+print(f)
+print("Доля зарабатывающих много среди женатых мужчин: ", a / len(df["salary"] == ">50K"))
+print("Доля зарабатывающих много среди неженатых мужчин: ", f / len(df["salary"] == ">50K"))
 
-df["marital-status"].value_counts()
-
-wealthy = df[df['salary']=='>50K']
-
-wealthy['marital-status'].unique()
-
-df[(df['sex'] == 'Male') & df['marital-status'].isin(['Never-married', 'Separated', 'Divorced'])]['salary'].value_counts()
-df[(df['sex'] == 'Male') & (df['marital-status'].str.startswith('Married'))]['salary'].value_counts()
 
 """**9. Какое максимальное число часов человек работает в неделю (признак *hours-per-week*)? Сколько людей работают такое количество часов и каков среди них процент зарабатывающих много?**"""
 
-max_load = df["hours-per-week"].max()
-print("Max time - {0} hours./week.".format(max_load))
-
-num_workaholics = df[df["hours-per-week"] == max_load].shape[0]
-print("Total number of such hard workers {0}".format(num_workaholics))
-
-rich_share = (float(df[(df["hours-per-week"] == 99) & (df["salary"] == ">50K")].shape[1]) / num_workaholics)
-df[(df["hours-per-week"] == 99) & (df["salary"] == ">50K")].shape[1]
-print("Percentage of rich among them {0}%".format(float(100 * rich_share)))
+df.columns = df.columns.str.replace(" ", "")
+df = df.replace(" ", "", regex=True)
+max_worktime = df["hours-per-week"].max()
+number = df[df["hours-per-week"] == max_worktime].shape[0]
+rich_number = float(
+    df[(df["hours-per-week"] == df["hours-per-week"].max()) & (df["salary"] == ">50K")].shape[0]
+)
+percent = float((float(rich_number * 100)) / (number))
+print("Максимальное количество рабочих часов в неделю:", max_worktime)
+print("Количество человек, работающих максимальное количество часов в неделю:", rich_number)
+print(
+    "Процент человек, зарабатывающих больше 50 тысяч, среди работающих максимальное количество часов в неделю:",
+    percent,
+    "%",
+)
 
 """**10. Посчитайте среднее время работы (*hours-per-week*) зарабатывающих мало и много (*salary*) для каждой страны (*native-country*).**"""
 
@@ -117,4 +133,4 @@ pd.crosstab(
     df["salary"],
     values=df["hours-per-week"],
     aggfunc=np.mean,
-).T
+).T()
