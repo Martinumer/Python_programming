@@ -128,9 +128,4 @@ print(
 
 """**10. Посчитайте среднее время работы (*hours-per-week*) зарабатывающих мало и много (*salary*) для каждой страны (*native-country*).**"""
 
-pd.crosstab(
-    df["native-country"],
-    df["salary"],
-    values=df["hours-per-week"],
-    aggfunc=np.mean,
-).T()
+pd.crosstab(df["native-country"], df["salary"], values=df["hours-per-week"], aggfunc=np.mean)
